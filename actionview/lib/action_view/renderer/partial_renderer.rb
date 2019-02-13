@@ -337,9 +337,14 @@ module ActionView
             spacer = find_template(@options[:spacer_template], @locals.keys).render(view, @locals)
           end
 
-          cache_collection_render(payload, view, template) do
-            template ? collection_with_template(view, template) : collection_without_template(view)
-          end.join(spacer).html_safe
+          collection_body = if template
+            cache_collection_render(payload, view, template) do
+              collection_with_template(view, template)
+            end
+          else
+            collection_without_template(view)
+          end
+          collection_body.join(spacer).html_safe
         end
       end
 

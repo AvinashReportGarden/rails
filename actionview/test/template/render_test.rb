@@ -752,6 +752,16 @@ class CachedCollectionViewRenderTest < ActiveSupport::TestCase
       @view.render(partial: "test/cached_customer", collection: [customer], cached: true)
   end
 
+  test "collection caching depends on a template" do
+    a = {}
+    b = {}
+    def a.to_partial_path; "test/partial_iteration_1"; end
+    def b.to_partial_path; "test/partial_iteration_2"; end
+
+    assert_equal "local-variable\nlocal-variable", @controller_view.render(partial: [a, b])
+    assert_equal "local-variable\nlocal-variable", @controller_view.render(partial: [a, b], cached: true)
+  end
+
   private
     def cache_key(*names, virtual_path)
       digest = ActionView::Digestor.digest name: virtual_path, finder: @view.lookup_context, dependencies: []
